@@ -266,10 +266,12 @@ def parse(tokens):
         data_literals = []
         match_token(TOKEN_LEFT_SQUARE_BRACKET)
         while tokens and tokens[0][0] != TOKEN_RIGHT_SQUARE_BRACKET:
+            # print(tokens)
             data_literals.append(data_literal())
             if tokens and tokens[0][0] == TOKEN_COMMA:
                 match_token(TOKEN_COMMA)
-                # print(tokens)
+                if(tokens[0][0] == TOKEN_RIGHT_SQUARE_BRACKET):
+                    sys.exit(1)
         if(match_token(TOKEN_RIGHT_SQUARE_BRACKET) == None):
             sys.exit(1)
         return ListLiteralNode(data_literals)
@@ -281,6 +283,8 @@ def parse(tokens):
             data_literals.append(data_literal())
             if tokens and tokens[0][0] == TOKEN_COMMA:
                 match_token(TOKEN_COMMA)
+                if(tokens[0][0] == TOKEN_RIGHT_CURLY_BRACE):
+                    sys.exit(1)
         if(match_token(TOKEN_RIGHT_CURLY_BRACE)==None):
             sys.exit(1)
         return TupleLiteralNode(data_literals)
@@ -292,6 +296,8 @@ def parse(tokens):
             key_pairs.append(key_pair())
             if tokens and tokens[0][0] == TOKEN_COMMA:
                 match_token(TOKEN_COMMA)
+                if(tokens[0][0] == TOKEN_RIGHT_CURLY_BRACE):
+                    sys.exit(1)
         if(match_token(TOKEN_RIGHT_CURLY_BRACE) == None):
             sys.exit(1)
         return MapLiteralNode(key_pairs)
@@ -350,6 +356,10 @@ def tokenize(input_str):
                     pos+=len(lexeme)
                     # print(match, lexeme, pos, len(lexeme))
                     tokens.append(Token(token_kind, lexeme, pos))
+                    # print(input_str[pos])
+                    # if(input_str[pos] != " " or input_str[pos] != "\n" 
+                    #    or input_str[pos] != ","): 
+                    #     sys.exit(1)
                     break
             # print(tokens)
             if not match: 
@@ -417,7 +427,7 @@ Token = namedtuple('Token', 'kind lexeme pos')
 
 # input_string = "[1,true,{:key=>'value',:key2=>55,key3:'value3'},%{:key=>'value',key3:'value3'}]"
 # input_string = "%{ [:a, 22] => { [1, 2, 3], :x },\nx: [99, %{ a: 33 }]\n}\n{ [1, 2], {:a, 22}, %{ a: 99, :b => 11} }\n[ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]"                          
-# input_string = "[1,]"
+# input_string = "truefalse"
 input_string = sys.stdin.read()
 # print(f"Input string: {input_string}")
 
