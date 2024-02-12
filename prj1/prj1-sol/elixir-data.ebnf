@@ -1,0 +1,30 @@
+
+<language> ::= <sentence>
+
+<sentence> ::= { <data-literal> }
+
+<data-literal> ::= <list-literal> | <tuple-literal> | <map-literal> | <primitive-literal>
+
+<primitive-literal> ::= <integer> | <atom> | <boolean>
+
+<list-literal> ::= "[" [ <data-literal> { "," <data-literal> } ] "]"
+
+<tuple-literal> ::= "{" [ <data-literal> { "," <data-literal> } ] "}"
+
+<map-literal> ::= "%{" [ <key-pair> { "," <key-pair> } ] "}"
+
+<key-pair> ::= <data-literal> "=>" <data-literal> | <key> <data-literal>
+
+<integer> ::= <digit> { <digit> | "_" }
+
+<atom> ::= ":" <alphabetic> { <alphanumeric> | "_" }
+
+<key> ::= <alphabetic> { <alphanumeric> | "_" } ":"
+
+<boolean> ::= "true" | "false"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<alphabetic> ::= "a" | "b" | "c" | ... | "z" | "A" | "B" | ... | "Z"
+
+<alphanumeric> ::= <alphabetic> | <digit>
