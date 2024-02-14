@@ -357,9 +357,10 @@ def tokenize(input_str):
                     # print(match, lexeme, pos, len(lexeme))
                     tokens.append(Token(token_kind, lexeme, pos))
                     # print(input_str[pos])
-                    # if(input_str[pos] != " " or input_str[pos] != "\n" 
-                    #    or input_str[pos] != ","): 
-                    #     sys.exit(1)
+                    # if(token_kind == TOKEN_BOOLEAN):
+                    #     if(input_str[pos] != " " or input_str[pos] != "\n" 
+                    #     or input_str[pos] != "," or input_str[pos] != r''): 
+                    #         sys.exit(1)
                     break
             # print(tokens)
             if not match: 
@@ -427,7 +428,7 @@ Token = namedtuple('Token', 'kind lexeme pos')
 
 # input_string = "[1,true,{:key=>'value',:key2=>55,key3:'value3'},%{:key=>'value',key3:'value3'}]"
 # input_string = "%{ [:a, 22] => { [1, 2, 3], :x },\nx: [99, %{ a: 33 }]\n}\n{ [1, 2], {:a, 22}, %{ a: 99, :b => 11} }\n[ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]"                          
-# input_string = "truefalse"
+# input_string = "abc"
 input_string = sys.stdin.read()
 # print(f"Input string: {input_string}")
 
