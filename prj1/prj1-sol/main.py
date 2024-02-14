@@ -22,7 +22,7 @@ TOKEN_FALSE = 'FALSE'
 TOKEN_EMPTY_SPACE = 'EMPTY_SPACE'
 TOKEN_EOF = 'EOF'
 
-# Token regular expressions
+# List of token kind and regular expressions
 TOKEN_REGEX = [
     (TOKEN_INTEGER, r'\d+(_\d+)*'),
     (TOKEN_ATOM, r':[a-zA-Z_][a-zA-Z0-9_]*'),
@@ -42,42 +42,6 @@ TOKEN_REGEX = [
     (TOKEN_EOF, r'<EOF>')
 ]
 
-
-'''
-<language> ::= <sentence>
-
-<sentence> ::= { <data-literal> }
-
-<data-literal> ::= <list-literal> | <tuple-literal> | <map-literal> | <primitive-literal>
-
-<primitive-literal> ::= <integer> | <atom> | <boolean>
-
-<list-literal> ::= "[" [ <data-literal> { "," <data-literal> } ] "]"
-
-<tuple-literal> ::= "{" [ <data-literal> { "," <data-literal> } ] "}"
-
-<map-literal> ::= "%{" [ <key-pair> { "," <key-pair> } ] "}"
-
-<key-pair> ::= <data-literal> "=>" <data-literal> | <key> <data-literal>
-
-<integer> ::= <digit> { <digit> | "_" }
-
-<atom> ::= ":" <alphabetic> { <alphanumeric> | "_" }
-
-<key> ::= <alphabetic> { <alphanumeric> | "_" } ":"
-
-<boolean> ::= "true" | "false"
-
-<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-
-<alphabetic> ::= "a" | "b" | "c" | ... | "z" | "A" | "B" | ... | "Z"
-
-<alphanumeric> ::= <alphabetic> | <digit>
-
-'''
-
-
-
 ################### AST Node types #########################
 class Node:
     def to_dict(self):
@@ -88,14 +52,12 @@ class LanguageNode(Node):
         self.sentence = sentence
     def to_dict(self):
         return self.sentence.to_dict()
-        # return {"language": self.sentence.to_dict()}
 
 class SentenceNode(Node):
     def __init__(self, data_literals):
         self.data_literals = data_literals
     def to_dict(self):
         return [data_literal.to_dict() for data_literal in self.data_literals if data_literal]
-        # return {"sentence": [data_literal.to_dict() for data_literal in self.data_literals if data_literal]}
 
 class DataLiteralNode(Node):
     def __init__(self, value):
@@ -120,7 +82,6 @@ class ListLiteralNode(DataLiteralNode):
         self.data_literals = data_literals
     def to_dict(self):
         return {"%k":"list", "%v": [data_literal.to_dict() for data_literal in self.data_literals if data_literal]}
-        # return {"list_literal": [data_literal.to_dict() for data_literal in self.data_literals if data_literal]}
     
 
 class TupleLiteralNode(DataLiteralNode):
@@ -128,7 +89,6 @@ class TupleLiteralNode(DataLiteralNode):
         self.data_literals = data_literals
     def to_dict(self):
         return {"%k":"tuple", "%v": [data_literal.to_dict() for data_literal in self.data_literals if data_literal]}
-        # return {"tuple_literal": [data_literal.to_dict() for data_literal in self.data_literals if data_literal]}
     
 
 class MapLiteralNode(DataLiteralNode):
@@ -136,7 +96,6 @@ class MapLiteralNode(DataLiteralNode):
         self.key_pairs = key_pairs
     def to_dict(self):
         return {"%k":"map", "%v": [key_pair.to_dict() for key_pair in self.key_pairs if key_pair]}
-        # return {"map_literal": [key_pair.to_dict() for key_pair in self.key_pairs if key_pair]}
     
 
 class PrimitiveLiteralNode(DataLiteralNode):
@@ -150,21 +109,18 @@ class IntegerNode(PrimitiveLiteralNode):
         self.value = value
     def to_dict(self):
         return {"%k":"int", "%v": int(self.value)}
-        # return {"integer": self.value}
 
 class AtomNode(PrimitiveLiteralNode):
     def __init__(self, value):
         self.value = value
     def to_dict(self):
         return {"%k": "atom", "%v": self.value}
-        # return {"atom": self.value}
 
 class KeyNode(PrimitiveLiteralNode):
     def __init__(self, value):
         self.value = value
     def to_dict(self):
         return {"%k":"atom", "%v": self.value[-1::-1]}
-        # return {"key": self.value}
 
 class BooleanNode(PrimitiveLiteralNode):
     def __init__(self, value):
@@ -172,8 +128,7 @@ class BooleanNode(PrimitiveLiteralNode):
     def to_dict(self):
         if(self.value == "true"): return {"%k":"bool", "%v": True}
         else: return {"%k":"bool", "%v": False}
-        # print(self.value)
-        # return {"bool": self.value}
+
 
 class KeyPairNode(Node):
     def __init__(self, key, value):
@@ -181,18 +136,15 @@ class KeyPairNode(Node):
         self.value = value
     def to_dict(self):
         return [self.key.to_dict(), self.value.to_dict()]
-        # return {"key_pair": {"%k": self.key.to_dict(), "%v": self.value.to_dict()}}
         
         
         
-
 ####################### Parser ##########################
 def parse(tokens):
     def match_token(token_type):
         nonlocal tokens
         if tokens and tokens[0][0] == token_type:
             return tokens.pop(0)
-        # sys.exit(1)
         return None
 
     def sentence():
@@ -266,7 +218,6 @@ def parse(tokens):
         data_literals = []
         match_token(TOKEN_LEFT_SQUARE_BRACKET)
         while tokens and tokens[0][0] != TOKEN_RIGHT_SQUARE_BRACKET:
-            # print(tokens)
             data_literals.append(data_literal())
             if tokens and tokens[0][0] == TOKEN_COMMA:
                 match_token(TOKEN_COMMA)
@@ -305,7 +256,6 @@ def parse(tokens):
     def key_pair():
         try: 
             key = data_literal()
-            # print(key)
             if tokens and tokens[0][0] == TOKEN_RIGHT_ARROW:
                 match_token(TOKEN_RIGHT_ARROW)
                 value = data_literal()
@@ -325,10 +275,6 @@ def parse(tokens):
 
     root_node = LanguageNode(sentence())
     return root_node
-
-
-########################## Parser 2 ##########################
-
 
 
 ########################### Lexer ############################
@@ -352,17 +298,12 @@ def tokenize(input_str):
                 match = regex.match(input_str, pos)
                 if match:
                     lexeme = match.group(0)
-                    # pos = match.end()
                     pos+=len(lexeme)
-                    # print(match, lexeme, pos, len(lexeme))
                     tokens.append(Token(token_kind, lexeme, pos))
-                    # print(input_str[pos])
-                    # if(token_kind == TOKEN_BOOLEAN):
-                    #     if(input_str[pos] != " " or input_str[pos] != "\n" 
-                    #     or input_str[pos] != "," or input_str[pos] != r''): 
-                    #         sys.exit(1)
+                    if(token_kind == TOKEN_BOOLEAN):
+                        if not any([True for ch in " ,\n\t" if input_str[pos]==ch]):
+                            raise ValueError(f"Invalid token at position {pos}: {input_str[pos:]}")
                     break
-            # print(tokens)
             if not match: 
                 raise ValueError(f"Invalid token at position {pos}: {input_str[pos:]}")
     except:
@@ -374,49 +315,7 @@ def tokenize(input_str):
 
 
 
-#################### Run Test cases #################################3
-def run_tests():
-    test_input_list = [
-        "", 
-        "[]",
-        "# this file contains no data", 
-        "# this file contains no data \n #but it contains multiple comments",
-        "# single atom\n:atom",
-        # "[1,true,{:key=>'value',:key2=>55,key3:'value3'},%{:key=>'value',key3:'value3'}]",
-        "# single int \n 1234",
-        "# multiple int's with internal underscores \n 123_456_789 \n 1_2_3"
-        "false\ntrue\ntrue false",
-        "true false",
-        "12_34\ntrue\n:some_long_atom_1234\nfalse\n833_4",
-        "[]\n[\n]",
-        "[ :a, 22, :b ][]\n[\n:some_atom12,\n# 99\n12\n]"
-        "{}\n{\n}",
-        "{ :a, 22 }\n{:x, :y, :z}{}\n{\n33\n} #{55}",
-        "%{}\n%{\n#:ignored\n}"
-        "%{ a: 22, :b => 33 }\n%{ [22] => 33, {:x} => :x } %{}\n%{ 22 => # ignore\n33\n}",
-        "%{ [:a, 22] => { [1, 2, 3], :x },\nx: [99, %{ a: 33 }]\n}\n{ [1, 2], {:a, 22}, %{ a: 99, :b => 11} }\n[ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]",                          
-        "[1, 2",
-        "%{ a: 33",
-        "truefalse",
-        "[1,]",
-        "{}}",
-        "12_3_"
-    ]
-    
-    i=0
-    for s in test_input_list :
-        print("============================== Test Case "+str(i+1)+" ================================")
-        print(f"\nInput string: {s}")
-        
-        tokens = tokenize(s)
-        print(f"Tokens: {tokens}")
-        
-        print("\nJSON:")
-        ast = parse(tokens)
-        json_output = json.dumps(ast.to_dict(), indent=2)
-        print(json_output)
-        
-        i+=1
+
    
    
    
@@ -425,26 +324,18 @@ def run_tests():
 
 Token = namedtuple('Token', 'kind lexeme pos')
 
-
-# input_string = "[1,true,{:key=>'value',:key2=>55,key3:'value3'},%{:key=>'value',key3:'value3'}]"
-# input_string = "%{ [:a, 22] => { [1, 2, 3], :x },\nx: [99, %{ a: 33 }]\n}\n{ [1, 2], {:a, 22}, %{ a: 99, :b => 11} }\n[ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]"                          
-# input_string = "abc"
+# input_string = "%{ [:a, 22] => { [1, 2, 3], :x },\nx: [99, %{ a: 33 }]\n}\n{ [1, 2], {:a, 22}, %{ a: 99, :b => 11} }\n[ {1, 2}, %{[:x] => 33, b: 44}, :c, [], [:d, 55] ]"       
+# input_string = "truefalse"                   
 input_string = sys.stdin.read()
-# print(f"Input string: {input_string}")
 
 tokens = tokenize(input_string)
 # print(*tokens,sep="\n")
 
 ast = parse(tokens)
-# print(f"\nAST: {ast}")
 
 json_output = json.dumps(ast.to_dict(), indent=2)
-# print("JSON:")
 print(json_output)
-# print(ast.to_dict())
 
-# print("##################################### Running Tests #####################################")
-# run_tests()
 
 
 
