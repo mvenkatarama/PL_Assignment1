@@ -6,6 +6,6 @@ dir=`dirname $0`
 #use $dir to access programs in this directory
 #so that this script can be run from any directory.
 
-echo "no build done"
+echo "No build done, as I'm using python"
 
 

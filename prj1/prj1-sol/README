@@ -1,6 +1,11 @@
-Name:		XXX
-B-Number:	XXX
-Email:		XXX
+Name:		Mukhil Venkataramanan
+B-Number:	B01039469
+Email:		mvenkatarama@binghamton.edu
 
-Add text here as needed to document the status of your project.
 
+Message to Grader/TA:
+1) I have added the name of the python file containing my Lexer and Parser code, in run.sh.
+2) I did not made any changes to make.sh file as I'm using python.
+3) I have used 'do-zip.sh' for zipping my project.
+4) I have tested my code against all the sample test provided and all of those testcases are passing!
+5) Hence, please let me know if you cannot run the project while grading. I can help you showing the output.
